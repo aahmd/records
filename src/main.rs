@@ -5,7 +5,7 @@ extern crate select;
 #[macro_use]
 extern crate serde_derive;
 
-// use csv::WriterBuilder;
+use csv::WriterBuilder;
 use rand::{thread_rng, Rng};
 use select::document::Document;
 #[allow(unused_imports)]
@@ -16,25 +16,22 @@ use std::{thread, time};
 #[derive(Serialize)]
 #[derive(Debug)]
 struct Label <'a> {
-    name: &'a str,
     label_id: u64,
-    // pratice Option and Match types
-    profile: Option<&'a str>,
-    sublabels: &'a str,
+    name: &'a str,
+    profile: &'a  str,
+    // pratice Option, Vec, Match types
     // contact_info: &'a str,
+    // sublabels: Vec<String>,
     // sites: &'a str,
 }
 
 fn main()-> Result<(), Box<Error>> {
-    let file_path = std::path::Path::new("test.csv");
-    let mut wtr = csv::Writer::from_path(file_path).unwrap();
-    // use non-default csv writer
-    // let mut wtr = WriterBuilder::new()
-    //     .delimiter(b',')
-    //     .escape(b'\n')
-    //     .from_path(file_path);
+    let file_path = std::path::Path::new("labels.csv");
+    let mut wtr = WriterBuilder::new()
+        .delimiter(b',')
+        .from_path(file_path)?;
 
-    for i in 1215..1220 {
+    for i in 1204..1218 {
         let wait_period: u64 = thread_rng().gen_range(150, 350);
         thread::sleep(time::Duration::from_millis(wait_period));
         let mut url = String::from(format!("https://www.discogs.com/label/{}", i));
@@ -47,10 +44,10 @@ fn main()-> Result<(), Box<Error>> {
                     label_id: label_id,
                     name: &node.find(Name("h1")).next().unwrap().text(),
                     // practic string methods:
-                    profile: node.find(Class("content")).next().unwrap().retain(),
-                    sublabels: &node.find(Class("content")).next().unwrap().text(),
-                    // contact_info:
-                    // sites:
+                    profile: &node.find(Class("content")).next().unwrap().text().replacen('\n', "", 10).trim(),
+                    // sublabels: node.find(Class("content")).take(1).map(|txt| txt.text()).take(3).collect(),
+                    // contact_info: &node.find(Class("content")).nth(2).unwrap().text(),                 
+                    // sites: &node.find(Class("content")).last().unwrap().text(),
                 })?;
             };
         } else {
