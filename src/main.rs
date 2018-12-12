@@ -46,10 +46,17 @@ fn main()-> Result<(), Box<Error>> {
                     label_id: label_id,
                     name: &node.find(Name("h1")).next().unwrap().text(),
                     // replace \n with "" on first 20 occurances:
-                    profile: node.find(Class("content")).next().unwrap().text().replacen('\n', "", 20).trim(),
+                    profile: node.find(Class("content"))
+                        .next()
+                        .unwrap()
+                        .text()
+                        .replace('\n', "")
+                        .trim(),
                     sublabels: node.find(Class("content"))
                         .nth(1)
-                        .map(|txt| txt.text().replace(" ", "").replacen("\n", "", 20)).ok_or("None"),
+                        .map(|txt| txt.text().replace(" ", "")
+                        .replacen("\n", "", 20))
+                        .ok_or("None"),
                     // contact_info: &node.find(Class("content")).nth(2).unwrap().text(),                 
                     // sites: &node.find(Class("content")).last().unwrap().text(),
                 })?;
